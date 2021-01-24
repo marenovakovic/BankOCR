@@ -5,10 +5,15 @@ import java.io.File
 import java.io.IOException
 
 object InputFileReaderImpl : FileReader {
-    override fun readLines(fileName: String): Either<IOException, List<String>> =
+    override fun readLines(fileName: String): Either<FileReadError, List<String>> =
         try {
-            Either.Right(File("input/$fileName").readLines())
+            val lines = File("input/$fileName").readLines()
+            lines.forEach { line ->
+                if (line.length != 27)
+                    return Either.Left(FileReadError.IncorrectCharacterCount)
+            }
+            Either.Right(lines)
         } catch (ioException: IOException) {
-            Either.Left(ioException)
+            Either.Left(FileReadError.IOException)
         }
 }
